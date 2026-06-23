@@ -107,9 +107,17 @@ export default function DashboardPage() {
         {/* Editor Section */}
         <ResumeEditor />
 
-        {/* Hidden export area */}
-        <div id="resume-export-area" className="hidden">
-          {/* This div is used for PDF export - it contains a styled version of the resume */}
+        {/* FIX: Export area uses position:absolute instead of display:none so html2canvas can render it */}
+        <div
+          id="resume-export-area"
+          style={{
+            position: "absolute",
+            left: "-9999px",
+            top: 0,
+            width: "210mm",
+            background: "#fff",
+          }}
+        >
           <div style={{ padding: "40px", fontFamily: "serif", color: "#000" }}>
             <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>
               AI 优化简历

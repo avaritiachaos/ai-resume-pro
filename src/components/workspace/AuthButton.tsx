@@ -12,16 +12,21 @@ import { LogIn, LogOut, User } from "lucide-react";
 import { useStore } from "@/lib/store";
 
 export function AuthButton() {
-  const { isAuthenticated, setAuthenticated, setCredits } = useStore();
+  const { isAuthenticated, setAuthenticated, resetUserState, credits, setCredits } = useStore();
 
   const handleLogin = () => {
     // In production, use: signIn('github') or signIn('google')
     setAuthenticated(true);
-    setCredits(1);
+    // FIX: Only set initial credits if this is a fresh user (credits was reset)
+    // Don't overwrite existing credits from a previous session
+    if (credits <= 0) {
+      setCredits(1);
+    }
   };
 
   const handleLogout = () => {
-    setAuthenticated(false);
+    // FIX: Reset all user-scoped state on logout to prevent cross-session data leak
+    resetUserState();
   };
 
   if (!isAuthenticated) {

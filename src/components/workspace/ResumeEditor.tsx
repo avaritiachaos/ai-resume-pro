@@ -20,7 +20,7 @@ interface ChatMessage {
 }
 
 export function ResumeEditor() {
-  const { resumeText, setResumeText, credits, useCredit, setPaywallOpen } =
+  const { resumeText, setResumeText, credits, useCredit, setCredits, setPaywallOpen } =
     useStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +30,8 @@ export function ResumeEditor() {
     async (textToOptimize: string) => {
       if (!textToOptimize.trim()) return;
 
-      const canUse = useCredit();
-      if (!canUse) {
+      // FIX: Check credit availability but don't deduct yet
+      if (credits <= 0) {
         setPaywallOpen(true);
         return;
       }
@@ -78,13 +78,17 @@ export function ResumeEditor() {
               )
             );
           }
+
+          // FIX: Only deduct credit AFTER successful API response
+          useCredit();
         }
       } catch (error) {
         console.error("Optimization failed:", error);
+        // FIX: Don't deduct credit on failure - no refund needed since we didn't deduct
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsg.id
-              ? { ...m, content: "优化失败，请重试。" }
+              ? { ...m, content: "优化失败，请重试。（本次未消耗额度）" }
               : m
           )
         );
@@ -92,7 +96,7 @@ export function ResumeEditor() {
         setIsLoading(false);
       }
     },
-    [useCredit, setPaywallOpen]
+    [credits, useCredit, setPaywallOpen]
   );
 
   const handleOptimizeAll = useCallback(() => {

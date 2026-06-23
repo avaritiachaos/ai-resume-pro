@@ -35,7 +35,7 @@ const plans = [
 ];
 
 export function PaywallDialog() {
-  const { isPaywallOpen, setPaywallOpen, setCredits } = useStore();
+  const { isPaywallOpen, setPaywallOpen, addCredits } = useStore();
 
   const handlePurchase = async (planId: string) => {
     try {
@@ -51,10 +51,10 @@ export function PaywallDialog() {
         // In production, redirect to Stripe checkout
         // window.location.href = data.url;
 
-        // Mock: add credits directly
+        // FIX: Use addCredits to accumulate instead of replacing
         const plan = plans.find((p) => p.id === planId);
         if (plan) {
-          setCredits(plan.credits);
+          addCredits(plan.credits);
         }
         setPaywallOpen(false);
       }
